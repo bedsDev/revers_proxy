@@ -1,0 +1,12 @@
+services:
+  web:
+    image: nginx
+    volumes:
+      - ./templates:/etc/nginx/templates
+      - ./config/revers_proxy.conf:/etc/nginx/conf.d/revers_proxy.conf
+    ports:
+      - "8080:80" 
+      - "8081:8081" 
+    environment:
+      - NGINX_HOST=foobar.com
+      - NGINX_PORT=80

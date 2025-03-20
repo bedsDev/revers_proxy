@@ -1,12 +1,43 @@
+
+
+
 services:
-  web:
+  nginx:
+    container_name: ${NGINX_HOST}
     image: nginx
+    restart: always
+    working_dir: /etc/nginx
+    env_file: .env
     volumes:
       - ./templates:/etc/nginx/templates
-      - ./config/revers_proxy.conf:/etc/nginx/conf.d/revers_proxy.conf
+      # - ./config/revers_proxy.conf:/etc/nginx/conf.d/revers_proxy.conf
+      # - ./config/default.conf:/etc/nginx/conf.d/default.conf
+      - ./config/default.conf.template:/etc/nginx/templates/default.conf.template
+      - ./config/ssl:/etc/nginx/ssl
     ports:
-      - "8080:80" 
-      - "8081:8081" 
-    environment:
-      - NGINX_HOST=foobar.com
-      - NGINX_PORT=80
+      - ${NGINX_PORT}:${NGINX_PORT}
+      # - "8080:80" 
+      # - "443:443" 
+      # - "8081:8081" 
+    # environment:
+    #   - NGINX_HOST=foobar.com
+    #   - NGINX_PORT=80
+    networks:
+      - universal
+  server:
+    container_name: ${SERVER_HOST}
+    image: node
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    volumes:
+      - ../ts_express:/app
+    working_dir: /app
+    env_file:
+      - ./.env
+    command: npm run dev
+    networks:
+      - universal
+
+networks:
+  universal: 
+    driver: bridge
